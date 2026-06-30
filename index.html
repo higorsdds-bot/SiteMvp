@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgroRota — Conecte sua carga ao transporte certo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --red: #EA1D2C;
+    --red-dark: #C8141F;
+    --green: #2E7D32;
+    --ink: #1F1B16;
+    --ink-soft: #6B6258;
+    --cream: #FFF8F2;
+    --card: #FFFFFF;
+    --line: #F0E4D8;
+    --gold: #FFB100;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--cream);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.display{font-family:'Sora',sans-serif;}
+
+  /* ---------- HEADER ---------- */
+  header.top{
+    background:linear-gradient(135deg,var(--red) 0%,var(--red-dark) 100%);
+    color:white;
+    padding:22px 24px 70px;
+    position:relative;
+    overflow:hidden;
+  }
+  header.top::after{
+    content:"";
+    position:absolute;
+    right:-60px; top:-60px;
+    width:220px; height:220px;
+    background:radial-gradient(circle, rgba(255,255,255,.15) 0%, transparent 70%);
+  }
+  .top-row{
+    max-width:1100px;margin:0 auto;
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:22px;}
+  .brand span.badge{
+    background:var(--gold);color:var(--ink);
+    font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;
+    letter-spacing:.04em;
+  }
+  .tagline{max-width:1100px;margin:18px auto 0;font-size:15px;color:#FFE3E3;}
+
+  .search-card{
+    max-width:1100px;margin:-46px auto 0;
+    background:var(--card);
+    border-radius:16px;
+    box-shadow:0 14px 30px rgba(0,0,0,.12);
+    padding:18px 20px;
+    display:flex;gap:12px;flex-wrap:wrap;align-items:center;
+    position:relative;z-index:5;
+  }
+  .search-card input{
+    flex:1;min-width:160px;border:1px solid var(--line);
+    border-radius:10px;padding:12px 14px;font-size:14px;font-family:inherit;
+  }
+  .search-card input:focus{outline:2px solid var(--red);outline-offset:1px;}
+  .search-btn{
+    background:var(--red);color:white;border:none;border-radius:10px;
+    padding:12px 22px;font-weight:700;cursor:pointer;font-size:14px;
+    transition:background .15s ease;
+  }
+  .search-btn:hover{background:var(--red-dark);}
+
+  /* ---------- TABS ---------- */
+  .tabs{
+    max-width:1100px;margin:28px auto 0;padding:0 4px;
+    display:flex;gap:8px;
+  }
+  .tab{
+    border:none;background:white;border:1px solid var(--line);
+    padding:9px 16px;border-radius:30px;font-weight:600;font-size:13px;
+    cursor:pointer;color:var(--ink-soft);
+  }
+  .tab.active{background:var(--ink);color:white;border-color:var(--ink);}
+
+  main{max-width:1100px;margin:0 auto;padding:18px 16px 60px;}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px;}
+  @media (max-width:760px){.grid2{grid-template-columns:1fr;}}
+
+  section.panel{display:none;}
+  section.panel.active{display:block;}
+
+  .card{
+    background:var(--card);border:1px solid var(--line);
+    border-radius:16px;padding:20px;
+  }
+  .card h2{margin:0 0 4px;font-size:18px;}
+  .card .sub{color:var(--ink-soft);font-size:13px;margin-bottom:16px;}
+
+  label{display:block;font-size:12px;font-weight:600;color:var(--ink-soft);margin:10px 0 4px;}
+  input.field, select.field{
+    width:100%;border:1px solid var(--line);border-radius:10px;
+    padding:11px 13px;font-size:14px;font-family:inherit;background:#FFFDFB;
+  }
+  input.field:focus, select.field:focus{outline:2px solid var(--red);outline-offset:1px;}
+
+  .btn-primary{
+    margin-top:16px;width:100%;background:var(--red);color:white;border:none;
+    padding:13px;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;
+  }
+  .btn-primary:hover{background:var(--red-dark);}
+  .btn-secondary{
+    margin-top:10px;width:100%;background:white;color:var(--ink);
+    border:1.5px solid var(--line);padding:12px;border-radius:12px;
+    font-weight:600;font-size:14px;cursor:pointer;
+  }
+
+  /* ---------- FEED / CARGA CARDS (estilo restaurante iFood) ---------- */
+  .feed-head{display:flex;align-items:baseline;justify-content:space-between;margin:26px 0 12px;}
+  .feed-head h2{font-size:18px;margin:0;}
+  .feed-head .count{color:var(--ink-soft);font-size:13px;}
+
+  .carga-list{display:flex;flex-direction:column;gap:12px;}
+
+  .carga-item{
+    display:flex;gap:14px;background:var(--card);border:1px solid var(--line);
+    border-radius:16px;padding:14px;cursor:pointer;transition:box-shadow .15s ease,transform .15s ease;
+  }
+  .carga-item:hover{box-shadow:0 8px 20px rgba(0,0,0,.08);transform:translateY(-1px);}
+
+  .thumb{
+    flex-shrink:0;width:78px;height:78px;border-radius:12px;
+    display:flex;align-items:center;justify-content:center;font-size:30px;
+    background:linear-gradient(135deg,#FFE9D6,#FFD2B0);
+  }
+  .ci-body{flex:1;min-width:0;}
+  .ci-top{display:flex;justify-content:space-between;gap:8px;}
+  .ci-title{font-weight:700;font-size:15px;}
+  .tag-peso{
+    background:#FFF1E0;color:#B5651D;font-size:11px;font-weight:700;
+    padding:3px 8px;border-radius:8px;white-space:nowrap;height:fit-content;
+  }
+  .ci-route{color:var(--ink-soft);font-size:13px;margin-top:4px;}
+  .ci-meta{display:flex;gap:14px;margin-top:8px;font-size:12px;color:var(--ink-soft);}
+  .ci-meta b{color:var(--ink);}
+  .status-pill{
+    display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;
+    padding:3px 9px;border-radius:20px;margin-top:8px;
+  }
+  .status-aberta{background:#E9F7EC;color:var(--green);}
+  .status-match{background:#FFF1E0;color:#C8141F;}
+
+  /* ---------- DRIVER CARDS ---------- */
+  .driver-item{
+    display:flex;gap:14px;background:var(--card);border:1px solid var(--line);
+    border-radius:16px;padding:14px;align-items:center;
+  }
+  .avatar{
+    width:52px;height:52px;border-radius:50%;background:var(--ink);color:white;
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;
+    flex-shrink:0;
+  }
+  .stars{color:var(--gold);font-size:12px;}
+
+  /* ---------- MATCH RESULT ---------- */
+  .match-card{
+    background:linear-gradient(135deg,#1F1B16,#3A2F26);color:white;
+    border-radius:18px;padding:22px;margin-top:16px;
+  }
+  .match-score{font-size:42px;font-weight:800;font-family:'Sora',sans-serif;color:var(--gold);}
+  .match-row{display:flex;justify-content:space-between;border-top:1px solid rgba(255,255,255,.15);padding:10px 0;font-size:13px;}
+  .pulse{
+    display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);
+    box-shadow:0 0 0 0 rgba(46,125,50,.6);animation:pulse 1.6s infinite;
+  }
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(46,125,50,.5);}
+    70%{box-shadow:0 0 0 8px rgba(46,125,50,0);}
+    100%{box-shadow:0 0 0 0 rgba(46,125,50,0);}
+  }
+
+  .map-wrap{margin-top:14px;border-radius:14px;overflow:hidden;border:1px solid var(--line);height:230px;}
+  .map-wrap iframe{width:100%;height:100%;border:0;}
+
+  .toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:var(--ink);color:white;padding:13px 22px;border-radius:12px;
+    font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:.25s ease;
+    z-index:50;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  .empty{
+    text-align:center;padding:30px;color:var(--ink-soft);font-size:14px;
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-row">
+    <div class="brand">🚜 AgroRota <span class="badge" >PLUS</span></div>
+  </div>
+  <p class="tagline">Conectando produtores e transportadores em todo o Brasil — peça seu frete em minutos.</p>
+</header>
+
+<div class="search-card">
+  <input id="qOrigem" class="field" placeholder="📍 Origem (cidade)">
+  <input id="qDestino" class="field" placeholder="🏁 Destino (cidade)">
+  <button class="search-btn" onclick="filtrarFeed()">Buscar fretes</button>
+</div>
+
+<main>
+  <div class="tabs">
+    <button class="tab active" data-tab="feed" onclick="trocarAba('feed')">🔎 Fretes disponíveis</button>
+    <button class="tab" data-tab="produtor" onclick="trocarAba('produtor')">👨‍🌾 Sou produtor</button>
+    <button class="tab" data-tab="motorista" onclick="trocarAba('motorista')">🚚 Sou motorista</button>
+    <button class="tab" data-tab="match" onclick="trocarAba('match')">⚡ Matching</button>
+  </div>
+
+  <section class="panel active" id="panel-feed">
+    <div class="feed-head">
+      <h2>Cargas postadas perto de você</h2>
+      <span class="count" id="feedCount">0 fretes</span>
+    </div>
+    <div class="carga-list" id="feedList"></div>
+  </section>
+
+  <section class="panel" id="panel-produtor">
+    <div class="grid2">
+      <div class="card">
+        <h2>👨‍🌾 Cadastrar carga</h2>
+        <div class="sub">Publique seu frete e receba propostas de transportadores.</div>
+
+        <label for="produtor">Nome do produtor</label>
+        <input id="produtor" class="field" placeholder="Ex: Fazenda Bom Sucesso">
+
+        <label for="origem">Cidade de origem</label>
+        <input id="origem" class="field" placeholder="Ex: Ribeirão Preto, SP">
+
+        <label for="destino">Cidade de destino</label>
+        <input id="destino" class="field" placeholder="Ex: Campinas, SP">
+
+        <label for="cargaTipo">Tipo de carga</label>
+        <select id="cargaTipo" class="field">
+          <option>Soja</option>
+          <option>Milho</option>
+          <option>Café</option>
+          <option>Boi gordo</option>
+          <option>Hortifruti</option>
+          <option>Cana-de-açúcar</option>
+        </select>
+
+        <label for="peso">Peso (kg)</label>
+        <input id="peso" type="number" class="field" placeholder="Ex: 12000">
+
+        <button class="btn-primary" onclick="salvarCarga()">Publicar carga</button>
+      </div>
+
+      <div class="card">
+        <h2>📦 Suas cargas publicadas</h2>
+        <div class="sub">Histórico simulado (somente nesta sessão)</div>
+        <div class="carga-list" id="minhasCargas"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-motorista">
+    <div class="grid2">
+      <div class="card">
+        <h2>🚚 Cadastrar motorista</h2>
+        <div class="sub">Informe sua rota e disponibilidade para receber fretes compatíveis.</div>
+
+        <label for="motorista">Nome do motorista</label>
+        <input id="motorista" class="field" placeholder="Ex: João da Silva">
+
+        <label for="rota">Rota disponível (destino atendido)</label>
+        <input id="rota" class="field" placeholder="Ex: Campinas, SP">
+
+        <label for="capacidade">Capacidade (kg)</label>
+        <input id="capacidade" type="number" class="field" placeholder="Ex: 15000">
+
+        <label for="veiculo">Tipo de veículo</label>
+        <select id="veiculo" class="field">
+          <option>Caminhão Truck</option>
+          <option>Carreta</option>
+          <option>Bitrem</option>
+          <option>VUC</option>
+          <option>Graneleiro</option>
+        </select>
+
+        <button class="btn-primary" onclick="salvarMotorista()">Cadastrar motorista</button>
+      </div>
+
+      <div class="card">
+        <h2>🧑‍✈️ Motoristas disponíveis</h2>
+        <div class="sub">Base simulada de transportadores ativos</div>
+        <div class="carga-list" id="listaMotoristas"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="panel-match">
+    <div class="card">
+      <h2>⚡ Matching inteligente</h2>
+      <div class="sub">Cruza a última carga e o último motorista cadastrados.</div>
+      <button class="btn-primary" onclick="buscarMatch()">Encontrar transporte ideal</button>
+      <div id="resultado"></div>
+      <div class="map-wrap" id="mapWrap" style="display:none;">
+        <iframe id="mapFrame" loading="lazy" allowfullscreen></iframe>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const GOOGLE_MAPS_API_KEY = "AIzaSyBVg4VDPRSZf73QPQRYSXCiA02lIzi6GGI";
+
+/* ---------------- MOCK DATA (cargas e motoristas de exemplo) ---------------- */
+const cargasMock = [
+  {id:1, produtor:"Fazenda Bom Sucesso", origem:"Ribeirão Preto, SP", destino:"Campinas, SP", tipo:"Soja", peso:12000, icon:"🌱", status:"aberta"},
+  {id:2, produtor:"Sítio Vale Verde", origem:"Uberlândia, MG", destino:"Belo Horizonte, MG", tipo:"Milho", peso:18000, icon:"🌽", status:"aberta"},
+  {id:3, produtor:"Fazenda Três Irmãos", origem:"Londrina, PR", destino:"Curitiba, PR", tipo:"Café", peso:9000, icon:"☕", status:"match"},
+  {id:4, produtor:"Rancho Boa Vista", origem:"Barretos, SP", destino:"São Paulo, SP", tipo:"Boi gordo", peso:21000, icon:"🐂", status:"aberta"},
+  {id:5, produtor:"Sítio Flor do Campo", origem:"Holambra, SP", destino:"Santos, SP", tipo:"Hortifruti", peso:5000, icon:"🥬", status:"aberta"},
+  {id:6, produtor:"Usina Santa Helena", origem:"Sertãozinho, SP", destino:"Paulínia, SP", tipo:"Cana-de-açúcar", peso:26000, icon:"🌾", status:"match"},
+];
+
+const motoristasMock = [
+  {nome:"João da Silva", rota:"Campinas, SP", capacidade:15000, veiculo:"Carreta", nota:4.9},
+  {nome:"Carlos Mendes", rota:"Belo Horizonte, MG", capacidade:20000, veiculo:"Bitrem", nota:4.7},
+  {nome:"Roberto Alves", rota:"Curitiba, PR", capacidade:10000, veiculo:"Truck", nota:4.8},
+  {nome:"Marcos Pereira", rota:"São Paulo, SP", capacidade:22000, veiculo:"Carreta", nota:4.6},
+];
+
+/* ---------------- ESTADO ---------------- */
+let carga = JSON.parse(localStorage.getItem("carga")) || null;
+let motorista = JSON.parse(localStorage.getItem("motorista")) || null;
+let minhasCargasState = JSON.parse(localStorage.getItem("minhasCargas")) || [];
+
+/* ---------------- TABS ---------------- */
+function trocarAba(nome){
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  document.getElementById("panel-"+nome).classList.add("active");
+  document.querySelector(`.tab[data-tab="${nome}"]`).classList.add("active");
+}
+
+/* ---------------- TOAST ---------------- */
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"), 2200);
+}
+
+/* ---------------- RENDER FEED ---------------- */
+function renderFeed(filtroOrigem="", filtroDestino=""){
+  const list = document.getElementById("feedList");
+  const todas = [...minhasCargasState, ...cargasMock];
+
+  const filtradas = todas.filter(c=>{
+    const okOrigem = !filtroOrigem || c.origem.toLowerCase().includes(filtroOrigem.toLowerCase());
+    const okDestino = !filtroDestino || c.destino.toLowerCase().includes(filtroDestino.toLowerCase());
+    return okOrigem && okDestino;
+  });
+
+  document.getElementById("feedCount").textContent = `${filtradas.length} frete${filtradas.length!==1?"s":""}`;
+
+  if(filtradas.length===0){
+    list.innerHTML = `<div class="empty">Nenhum frete encontrado para essa rota. Tente outra busca.</div>`;
+    return;
+  }
+
+  list.innerHTML = filtradas.map(c=>`
+    <div class="carga-item" onclick='usarComoCarga(${JSON.stringify(c)})'>
+      <div class="thumb">${c.icon || "📦"}</div>
+      <div class="ci-body">
+        <div class="ci-top">
+          <div class="ci-title">${c.tipo} — ${c.produtor}</div>
+          <div class="tag-peso">${Number(c.peso).toLocaleString('pt-BR')} kg</div>
+        </div>
+        <div class="ci-route">${c.origem} → ${c.destino}</div>
+        <div class="ci-meta">
+          <span><b>Tipo:</b> ${c.tipo}</span>
+        </div>
+        <span class="status-pill ${c.status==='match'?'status-match':'status-aberta'}">
+          ${c.status==='match' ? '🔴 Em negociação' : '🟢 Aberta para frete'}
+        </span>
+      </div>
+    </div>
+  `).join("");
+}
+
+function usarComoCarga(c){
+  carga = {produtor:c.produtor, origem:c.origem, destino:c.destino, tipo:c.tipo, peso:c.peso};
+  localStorage.setItem("carga", JSON.stringify(carga));
+  showToast(`Carga "${c.tipo}" selecionada para matching ⚡`);
+  trocarAba("match");
+}
+
+function filtrarFeed(){
+  renderFeed(document.getElementById("qOrigem").value, document.getElementById("qDestino").value);
+}
+
+/* ---------------- RENDER MOTORISTAS ---------------- */
+function renderMotoristas(){
+  const list = document.getElementById("listaMotoristas");
+  const todos = motorista ? [motorista, ...motoristasMock] : motoristasMock;
+  list.innerHTML = todos.map(m=>`
+    <div class="driver-item">
+      <div class="avatar">${(m.nome||"?").split(" ").map(p=>p[0]).slice(0,2).join("").toUpperCase()}</div>
+      <div style="flex:1;">
+        <div style="font-weight:700;font-size:14px;">${m.nome}</div>
+        <div style="font-size:12px;color:var(--ink-soft);">${m.veiculo} · até ${Number(m.capacidade).toLocaleString('pt-BR')} kg · rota ${m.rota}</div>
+        <div class="stars">★★★★★ ${m.nota || "4.8"}</div>
+      </div>
+    </div>
+  `).join("");
+}
+
+/* ---------------- RENDER MINHAS CARGAS ---------------- */
+function renderMinhasCargas(){
+  const list = document.getElementById("minhasCargas");
+  if(minhasCargasState.length===0){
+    list.innerHTML = `<div class="empty">Você ainda não publicou nenhuma carga.</div>`;
+    return;
+  }
+  list.innerHTML = minhasCargasState.map(c=>`
+    <div class="carga-item">
+      <div class="thumb">${c.icon}</div>
+      <div class="ci-body">
+        <div class="ci-top">
+          <div class="ci-title">${c.tipo} — ${c.produtor}</div>
+          <div class="tag-peso">${Number(c.peso).toLocaleString('pt-BR')} kg</div>
+        </div>
+        <div class="ci-route">${c.origem} → ${c.destino}</div>
+        <span class="status-pill status-aberta">🟢 Aberta para frete</span>
+      </div>
+    </div>
+  `).join("");
+}
+
+/* ---------------- AÇÕES ---------------- */
+const iconesPorTipo = {"Soja":"🌱","Milho":"🌽","Café":"☕","Boi gordo":"🐂","Hortifruti":"🥬","Cana-de-açúcar":"🌾"};
+
+function salvarCarga(){
+  const produtorV = document.getElementById("produtor").value.trim();
+  const origemV = document.getElementById("origem").value.trim();
+  const destinoV = document.getElementById("destino").value.trim();
+  const tipoV = document.getElementById("cargaTipo").value;
+  const pesoV = document.getElementById("peso").value;
+
+  if(!produtorV || !origemV || !destinoV || !pesoV){
+    showToast("Preencha todos os campos da carga.");
+    return;
+  }
+
+  carga = {produtor:produtorV, origem:origemV, destino:destinoV, tipo:tipoV, peso:pesoV};
+  localStorage.setItem("carga", JSON.stringify(carga));
+
+  minhasCargasState.unshift({...carga, icon: iconesPorTipo[tipoV] || "📦", id: Date.now(), status:"aberta"});
+  localStorage.setItem("minhasCargas", JSON.stringify(minhasCargasState));
+
+  renderMinhasCargas();
+  renderFeed();
+  showToast("Carga publicada com sucesso! 🚜");
+
+  ["produtor","origem","destino","peso"].forEach(id=>document.getElementById(id).value="");
+}
+
+function salvarMotorista(){
+  const nomeV = document.getElementById("motorista").value.trim();
+  const rotaV = document.getElementById("rota").value.trim();
+  const capacidadeV = document.getElementById("capacidade").value;
+  const veiculoV = document.getElementById("veiculo").value;
+
+  if(!nomeV || !rotaV || !capacidadeV){
+    showToast("Preencha todos os campos do motorista.");
+    return;
+  }
+
+  motorista = {nome:nomeV, rota:rotaV, capacidade:capacidadeV, veiculo:veiculoV, nota:"4.9 (novo)"};
+  localStorage.setItem("motorista", JSON.stringify(motorista));
+
+  renderMotoristas();
+  showToast("Motorista cadastrado com sucesso! 🚚");
+
+  ["motorista","rota","capacidade"].forEach(id=>document.getElementById(id).value="");
+}
+
+/* ---------------- MATCHING ---------------- */
+function buscarMatch(){
+  const resultado = document.getElementById("resultado");
+  const mapWrap = document.getElementById("mapWrap");
+
+  if(!carga || !motorista){
+    resultado.innerHTML = `<div class="empty" style="background:#FFF1E0;border-radius:12px;margin-top:14px;">
+      Cadastre (ou selecione no feed) uma carga e um motorista primeiro.
+    </div>`;
+    mapWrap.style.display = "none";
+    return;
+  }
+
+  let compatibilidade = 0;
+  if(carga.destino.toLowerCase().includes(motorista.rota.toLowerCase()) || motorista.rota.toLowerCase().includes(carga.destino.toLowerCase())){
+    compatibilidade += 50;
+  }
+  if(Number(motorista.capacidade) >= Number(carga.peso)){
+    compatibilidade += 50;
+  }
+
+  const ok = compatibilidade >= 80;
+
+  resultado.innerHTML = `
+    <div class="match-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <div style="font-size:13px;color:#FFD9A0;font-weight:700;letter-spacing:.04em;">
+            <span class="pulse"></span>  ${ok ? "TRANSPORTE ENCONTRADO" : "COMPATIBILIDADE PARCIAL"}
+          </div>
+          <div class="match-score">${compatibilidade}%</div>
+        </div>
+        <div style="text-align:right;font-size:13px;color:#FFD9A0;">${carga.tipo}<br>${Number(carga.peso).toLocaleString('pt-BR')} kg</div>
+      </div>
+      <div class="match-row"><span>Produtor</span><b>${carga.produtor}</b></div>
+      <div class="match-row"><span>Rota</span><b>${carga.origem} → ${carga.destino}</b></div>
+      <div class="match-row"><span>Motorista</span><b>${motorista.nome}</b></div>
+      <div class="match-row"><span>Veículo</span><b>${motorista.veiculo} · ${Number(motorista.capacidade).toLocaleString('pt-BR')} kg</b></div>
+    </div>
+  `;
+
+  // URL corrigida da API de Embed do Google Maps (Directions Mode)
+  const origemEnc = encodeURIComponent(carga.origem);
+  const destinoEnc = encodeURIComponent(carga.destino);
+  mapWrap.style.display = "block";
+  document.getElementById("mapFrame").src =
+    `https://www.google.com/maps/embed/v1/directions?key=${GOOGLE_MAPS_API_KEY}&origin=${origemEnc}&destination=${destinoEnc}&mode=driving`;
+}
+
+/* ---------------- INIT ---------------- */
+renderFeed();
+renderMotoristas();
+renderMinhasCargas();
+</script>
+
+</body>
+</html>
