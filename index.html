@@ -536,16 +536,9 @@ function buscarMatch(){
       <div class="match-row"><span>Motorista</span><b>${motorista.nome}</b></div>
       <div class="match-row"><span>Veículo</span><b>${motorista.veiculo} · ${Number(motorista.capacidade).toLocaleString('pt-BR')} kg</b></div>
     </div>
-  `;
-
-  // URL corrigida da API de Embed do Google Maps (Directions Mode)
-  const origemEnc = encodeURIComponent(carga.origem);
-  const destinoEnc = encodeURIComponent(carga.destino);
-  mapWrap.style.display = "block";
-  document.getElementById("mapFrame").src =
-    `https://www.google.com/maps/embed/v1/directions?key=${GOOGLE_MAPS_API_KEY}&origin=${origemEnc}&destination=${destinoEnc}&mode=driving`;
-}
-
+  `
+  }
+  
 /* ---------------- INIT ---------------- */
 renderFeed();
 renderMotoristas();
